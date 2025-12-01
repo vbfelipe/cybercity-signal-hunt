@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Cybercity Signal Hunt</title>
+    <link rel="stylesheet" href="style.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Start screen -->
+<div id="start">
+    <div class="start-wrapper">
+        <h1 class="title">CYBERCITY<br>SIGNAL HUNT</h1>
+
+        <p class="subtitle">
+            Connect to the grid.<br>
+            Destroy the corrupted signals.<br>
+            Save the city.
+        </p>
+        
+        <!-- Difficulty selector -->
+        <p class="difficulty-title">Select Difficulty:</p>
+        <div id="difficultySelect">
+            <div class="diff-btn" data-mode="easy">EASY</div>
+            <div class="diff-btn active" data-mode="normal">NORMAL</div>
+            <div class="diff-btn" data-mode="hard">HARD</div>
+            <div class="diff-btn" data-mode="chaos">CHAOS_MODE</div>
+        </div>
+
+        <div id="startButton">CONNECT</div>
+
+        <p class="credits">© 2025 — A mini-game by Felipe Vicentini</p>
+    </div>
+</div>
+
+<!-- Restart overlay -->
+<div id="restart">
+    <div id="restartBox">SCORE: 0 — RESTART?</div>
+    <div id="backBox">BACK</div>
+</div> 
+
+<!-- HUD -->
+<div id="score">Score: 0</div>
+<div id="timer">30</div>
+
+<!-- Moving target -->
+<div id="circle" style="display:none;"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

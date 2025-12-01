@@ -1,0 +1,303 @@
+/* ------------------------------------------------------
+   BASE LAYOUT
+------------------------------------------------------ */
+body {
+    margin: 0;
+    height: 100vh;
+    font-family: 'Orbitron', sans-serif;
+    background: radial-gradient(circle at center,
+        #0a0a0a 0%, #050505 40%, #000 100%);
+    overflow: hidden;
+    color: #0ff;
+    user-select: none;
+    touch-action: none;
+}
+
+/* ------------------------------------------------------
+   GRID BACKGROUND ANIMATION
+------------------------------------------------------ */
+body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-size: 6vmin 6vmin;
+    background:
+        repeating-linear-gradient(
+            to right,
+            rgba(0,255,255,0.08) 0 2px,
+            transparent 2px 40px
+        ),
+        repeating-linear-gradient(
+            to bottom,
+            rgba(255,0,255,0.08) 0 2px,
+            transparent 2px 40px
+        );
+    animation: glitchGrid 1.5s linear infinite;
+    z-index: -1;
+}
+
+@keyframes glitchGrid { 
+    0%, 100% { transform: translate(0,0); }
+    50%      { transform: translate(5px,5px); }
+}
+
+/* ------------------------------------------------------
+   HUD (Score & Timer)
+------------------------------------------------------ */
+#score, #timer {
+    position: absolute;
+    top: 20px;
+    font-size: 3vmin;
+    text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+    z-index: 20;
+}
+#score { left: 20px; }
+#timer { right: 20px; }
+
+/* ------------------------------------------------------
+   START SCREEN — NEW DESIGN
+------------------------------------------------------ */
+#start {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    text-align: center;
+    color: #0ff;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.start-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4vmin;
+}
+
+.title {
+    margin: 0;
+    font-size: 8vmin;
+    letter-spacing: 0.4vmin;
+    font-weight: bold;
+    color: #f0f;
+    text-shadow:
+        0 0 15px #f0f,
+        0 0 30px #f0f,
+        0 0 50px #0ff;
+}
+
+.subtitle {
+    margin: 0;
+    font-size: 3.2vmin;
+    opacity: 0.85;
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff;
+}
+
+#startButton {
+    margin-top: 6vmin;
+    padding: 2vmin 5vmin;
+    border: 2px solid #0ff;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.4);
+    font-size: 4vmin;
+    cursor: pointer;
+    text-shadow:
+        0 0 10px #0ff,
+        0 0 18px #0ff,
+        0 0 25px #f0f;
+    transition: 0.18s ease;
+}
+
+#startButton:hover {
+    transform: scale(1.12);
+    box-shadow:
+        0 0 25px #0ff,
+        0 0 45px #0ff,
+        0 0 70px #f0f;
+}
+
+.credits {
+    margin-top: 6vmin;
+    font-size: 2.2vmin;
+    opacity: 0.5;
+    text-shadow: 0 0 5px #0ff;
+}
+
+/* ------------------------------------------------------
+   RESTART OVERLAY
+------------------------------------------------------ */
+#restart {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    pointer-events: none;
+}
+
+#restartBox,
+#backBox {
+    pointer-events: auto;
+    padding: 2vmin 4vmin;
+    border: 2px solid #0ff;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.5);
+    color: #0ff;
+    font-size: 4vmin;
+    cursor: pointer;
+    text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+    transition: 0.15s ease;
+}
+
+#restartBox:hover,
+#backBox:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px #0ff, 0 0 40px #0ff;
+}
+
+#backBox {
+    margin-top: 6vmin;
+}
+
+/* ------------------------------------------------------
+   TARGET CIRCLE
+------------------------------------------------------ */
+#circle {
+    position: absolute;
+    width: 8vmin; height: 8vmin;
+    min-width: 45px; min-height: 45px;
+    max-width: 80px; max-height: 80px;
+    background: rgb(255, 0, 0);
+    border-radius: 50%;
+    box-shadow: 0 0 2vmin rgb(255, 0, 0), 0 0 4vmin rgb(255, 0, 0);
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.12s linear;
+    z-index: 10;
+}
+
+#circle:hover {
+    transform: scale(1.15);
+}
+
+/* ------------------------------------------------------
+   PARTICLES
+------------------------------------------------------ */
+.particle {
+    position: absolute;
+    width: 1.2vmin; height: 1.2vmin;
+    min-width: 6px; min-height: 6px;
+    max-width: 12px; max-height: 12px;
+    background: rgb(255, 0, 0);
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 1;
+    box-shadow:
+        0 0 8px rgb(255, 0, 0),
+        0 0 18px rgb(255, 0, 0),
+        0 0 28px #f0f;
+    transition:
+        transform 0.4s cubic-bezier(0.05, 0.8, 0.2, 1),
+        opacity 0.8s ease-out;
+    z-index: 15;
+}
+
+/* ------------------------------------------------------
+   SCREEN SHAKE
+------------------------------------------------------ */
+.shake {
+    animation: screenShake 0.15s ease;
+}
+
+@keyframes screenShake {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(4px, -4px); }
+    50%  { transform: translate(-4px, 4px); }
+    75%  { transform: translate(3px, -3px); }
+    100% { transform: translate(0, 0); }
+}
+
+/* ------------------------------------------------------
+   HIT / MISS FLOATING TEXT
+------------------------------------------------------ */
+.floating-text {
+    position: absolute;
+    font-size: 2.2vmin;
+    opacity: 1;
+    pointer-events: none;
+    transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+    z-index: 200;
+}
+
+/* HIT = GREEN */
+.floating-hit {
+    color: rgb(0, 255, 0);
+    text-shadow: 0 0 10px rgb(0, 255, 0), 0 0 25px rgb(0, 255, 0);
+}
+
+/* MISS = RED */
+.floating-miss {
+    color: rgb(255, 0, 0);
+    text-shadow: 0 0 10px rgb(255, 0, 0), 0 0 25px rgb(255, 0, 0);
+}
+
+/* ------------------------------------------------------
+   DIFFICULTY SELECT
+------------------------------------------------------ */
+#difficultySelect {
+    margin-top: -3vmin;
+    display: flex;
+    gap: 1.5vmin;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.diff-btn {
+    padding: 1.2vmin 2.5vmin;
+    border: 2px solid #0ff;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.35);
+    font-size: 2.5vmin;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: 0.15s ease;
+    text-shadow: 0 0 10px #0ff;
+}
+
+.diff-btn:hover {
+    background: rgba(0,255,255,0.15);
+    opacity: 1;
+}
+
+.diff-btn.active {
+    background: rgba(0,255,255,0.25);
+    opacity: 1;
+    box-shadow: 0 0 20px #0ff;
+}
+
+/* ------------------------------------------------------
+   CHAOS MODE FLASH
+------------------------------------------------------ */
+.chaos-flash {
+    background: rgba(255, 0, 0, 0.25) !important;
+}
+
+/* ------------------------------------------------------
+   DIFFICULTY TITLE
+------------------------------------------------------ */
+.difficulty-title {
+    width: 100%;
+    text-align: center;
+    font-size: 2.5vmin;
+    margin-bottom: 1vmin;
+    color: #0ff;
+    letter-spacing: 0.4vmin;
+    text-shadow: 0 0 10px rgba(0,255,255,0.7);
+    opacity: 0.85;
+}
