@@ -103,7 +103,7 @@ function explodeCircle() {
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
 
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 54; i++) {
         const p = document.createElement("div");
         p.className = "particle";
         document.body.appendChild(p);
