@@ -55,21 +55,6 @@ body::before {
 
 /* ------------------------------------------------------
    START SCREEN
------------------------------------------------------- 
-#start, #restart {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    background: rgba(0,0,0,0.85);
-    z-index: 100;
-}
-*/
-
-/* ------------------------------------------------------
-   START SCREEN
 ------------------------------------------------------ */
 #start {
     position: fixed;
@@ -223,6 +208,17 @@ body::before {
     pointer-events: none;
     z-index: 200;
     transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+}
+
+/* Floating text colors */
+.floating-hit {
+    color: #0f0; /* bright green */
+    text-shadow: 0 0 8px #0f0, 0 0 16px #0f0;
+}
+
+.floating-miss {
+    color: #f00; /* bright red */
+    text-shadow: 0 0 8px #f00, 0 0 16px #f00;
 }
 
 /* Particles */
