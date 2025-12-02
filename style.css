@@ -55,7 +55,7 @@ body::before {
 
 /* ------------------------------------------------------
    START SCREEN
------------------------------------------------------- */
+------------------------------------------------------ 
 #start, #restart {
     position: fixed;
     inset: 0;
@@ -64,6 +64,41 @@ body::before {
     align-items: center;
     text-align: center;
     background: rgba(0,0,0,0.85);
+    z-index: 100;
+}
+*/
+
+/* ------------------------------------------------------
+   START SCREEN
+------------------------------------------------------ */
+#start {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    /* Cyberpunk city background */
+    background: url('city-bg.jpg') center/cover no-repeat;
+    background-color: rgba(0,0,0,0.65); /* dark overlay for readability */
+    background-blend-mode: darken;
+
+    z-index: 100;
+}
+
+/* ------------------------------------------------------
+   RESTART SCREEN
+------------------------------------------------------ */
+#restart {
+    position: fixed;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: rgba(0,0,0,0.85); /* keep solid for clarity */
     z-index: 100;
 }
 
