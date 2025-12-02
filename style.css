@@ -1,44 +1,63 @@
 /* ------------------------------------------------------
+   ROOT VARIABLES (responsive)
+------------------------------------------------------ */
+:root{
+    /* Base sizes that scale nicely across devices */
+    --fs-title: clamp(28px, 6vmin, 64px);       /* page title size */
+    --fs-sub: clamp(12px, 2.3vmin, 20px);       /* subtitle */
+    --fs-hud: clamp(12px, 2.2vmin, 18px);       /* score/timer */
+    --btn-pad-y: clamp(10px, 1.8vmin, 22px);
+    --btn-pad-x: clamp(18px, 4vmin, 48px);
+    --ui-gap: clamp(12px, 3.5vmin, 36px);
+    --ghost-glow: 0 0 10px rgba(0,255,255,0.2);
+}
+
+/* ------------------------------------------------------
    BASE LAYOUT
 ------------------------------------------------------ */
+* { box-sizing: border-box; }
+html,body { height:100%; }
 body {
     margin: 0;
     height: 100vh;
     font-family: 'Orbitron', sans-serif;
     background: radial-gradient(circle at center,
         #0a0a0a 0%, #050505 40%, #000 100%);
-    overflow: hidden;
+    overflow: hidden; /* game uses full viewport */
     color: #0ff;
     user-select: none;
-    touch-action: none;
+    touch-action: manipulation; /* better touch handling */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* ------------------------------------------------------
    GRID BACKGROUND ANIMATION
+   use clamp-friendly background-size so it scales
 ------------------------------------------------------ */
 body::before {
     content: "";
     position: absolute;
     inset: 0;
-    background-size: 6vmin 6vmin;
+    background-size: clamp(28px, 6vmin, 48px) clamp(28px, 6vmin, 48px);
     background:
         repeating-linear-gradient(
             to right,
-            rgba(0,255,255,0.08) 0 2px,
+            rgba(0,255,255,0.06) 0 2px,
             transparent 2px 40px
         ),
         repeating-linear-gradient(
             to bottom,
-            rgba(255,0,255,0.08) 0 2px,
+            rgba(255,0,255,0.06) 0 2px,
             transparent 2px 40px
         );
     animation: glitchGrid 1.5s linear infinite;
     z-index: -1;
 }
-
-@keyframes glitchGrid { 
-    0%, 100% { transform: translate(0,0); }
-    50%      { transform: translate(5px,5px); }
+@keyframes glitchGrid {
+    0%,100%{ transform: translate(0,0); }
+    50%{ transform: translate(4px,4px); }
 }
 
 /* ------------------------------------------------------
@@ -46,16 +65,21 @@ body::before {
 ------------------------------------------------------ */
 #score, #timer {
     position: absolute;
-    top: 20px;
-    font-size: 3vmin;
+    top: 14px;
+    font-size: var(--fs-hud);
     text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
-    z-index: 20;
+    z-index: 60;
+    padding: 6px 8px;
+    background: rgba(0,0,0,0.18);
+    border-radius: 6px;
+    pointer-events: none;
+    line-height:1;
 }
-#score { left: 20px; }
-#timer { right: 20px; }
+#score { left: 12px; }
+#timer { right: 12px; }
 
 /* ------------------------------------------------------
-   START SCREEN — NEW DESIGN
+   START SCREEN — NEW DESIGN (responsive)
 ------------------------------------------------------ */
 #start {
     position: absolute;
@@ -67,64 +91,66 @@ body::before {
     z-index: 100;
     text-align: center;
     color: #0ff;
-    -webkit-tap-highlight-color: transparent;
 }
 
 .start-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4vmin;
+    gap: var(--ui-gap);
+    width: min(92vw, 980px);
+    padding: clamp(18px, 3vmin, 48px);
 }
 
-.title {
+/* Title */
+.title{
     margin: 0;
-    font-size: 8vmin;
-    letter-spacing: 0.4vmin;
-    font-weight: bold;
+    font-size: var(--fs-title);
+    letter-spacing: clamp(3px, 0.4vmin, 10px);
+    font-weight: 700;
     color: #f0f;
     text-shadow:
-        0 0 15px #f0f,
-        0 0 30px #f0f,
-        0 0 50px #0ff;
+        0 0 12px #f0f,
+        0 0 28px #f0f,
+        0 0 44px #0ff;
+    line-height: 0.95;
 }
 
+/* Subtitle */
 .subtitle {
     margin: 0;
-    font-size: 3.2vmin;
-    opacity: 0.85;
+    font-size: var(--fs-sub);
+    opacity: 0.9;
     color: #0ff;
-    text-shadow: 0 0 10px #0ff;
+    text-shadow: 0 0 6px #0ff;
+    white-space: pre-line;
 }
 
+/* Start button */
 #startButton {
-    margin-top: 6vmin;
-    padding: 2vmin 5vmin;
+    margin-top: 6px;
+    padding: var(--btn-pad-y) var(--btn-pad-x);
     border: 2px solid #0ff;
     border-radius: 14px;
     background: rgba(0,0,0,0.4);
-    font-size: 4vmin;
+    font-size: clamp(14px, 3vmin, 28px);
     cursor: pointer;
     text-shadow:
-        0 0 10px #0ff,
-        0 0 18px #0ff,
-        0 0 25px #f0f;
-    transition: 0.18s ease;
+        0 0 8px #0ff,
+        0 0 14px #0ff,
+        0 0 20px #f0f;
+    transition: transform .14s ease, box-shadow .14s ease;
+    user-select: none;
 }
+#startButton:active { transform: scale(.98); }
+#startButton:hover { transform: scale(1.04); box-shadow: 0 0 28px #0ff; }
 
-#startButton:hover {
-    transform: scale(1.12);
-    box-shadow:
-        0 0 25px #0ff,
-        0 0 45px #0ff,
-        0 0 70px #f0f;
-}
-
-.credits {
-    margin-top: 6vmin;
-    font-size: 2.2vmin;
-    opacity: 0.5;
-    text-shadow: 0 0 5px #0ff;
+/* Credits */
+.credits{
+    margin-top: 6px;
+    font-size: clamp(11px, 1.6vmin, 16px);
+    opacity: 0.6;
+    text-shadow: 0 0 4px #0ff;
 }
 
 /* ------------------------------------------------------
@@ -138,62 +164,50 @@ body::before {
     align-items: center;
     justify-content: center;
     background: rgba(0,0,0,0.85);
-    z-index: 100;
+    z-index: 120;
     pointer-events: none;
 }
 
-#restartBox,
-#backBox {
+#restartBox, #backBox {
     pointer-events: auto;
-    padding: 2vmin 4vmin;
+    padding: 1.4rem 2rem;
     border: 2px solid #0ff;
     border-radius: 12px;
     background: rgba(0,0,0,0.5);
     color: #0ff;
-    font-size: 4vmin;
+    font-size: clamp(16px, 3vmin, 28px);
     cursor: pointer;
     text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
-    transition: 0.15s ease;
+    transition: transform .12s ease, box-shadow .12s ease;
 }
-
-#restartBox:hover,
-#backBox:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 25px #0ff, 0 0 40px #0ff;
-}
-
-#backBox {
-    margin-top: 6vmin;
-}
+#backBox { margin-top: 2.6rem; }
 
 /* ------------------------------------------------------
-   TARGET CIRCLE
+   TARGET CIRCLE (responsive sizing via clamp)
 ------------------------------------------------------ */
 #circle {
     position: absolute;
-    width: 8vmin; height: 8vmin;
+    width: clamp(45px, 8vmin, 80px);
+    height: clamp(45px, 8vmin, 80px);
     min-width: 45px; min-height: 45px;
     max-width: 80px; max-height: 80px;
     background: rgb(255, 0, 0);
     border-radius: 50%;
-    box-shadow: 0 0 2vmin rgb(255, 0, 0), 0 0 4vmin rgb(255, 0, 0);
+    box-shadow: 0 0 1.6rem rgb(255, 0, 0), 0 0 2.4rem rgb(255, 0, 0);
     cursor: pointer;
-    transition: transform 0.1s ease, opacity 0.12s linear;
-    z-index: 10;
+    transition: transform 0.08s ease, opacity 0.12s linear, width .12s ease, height .12s ease;
+    z-index: 40;
+    touch-action: none;
 }
-
-#circle:hover {
-    transform: scale(1.15);
-}
+#circle:hover { transform: scale(1.12); }
 
 /* ------------------------------------------------------
    PARTICLES
 ------------------------------------------------------ */
 .particle {
     position: absolute;
-    width: 1.2vmin; height: 1.2vmin;
-    min-width: 6px; min-height: 6px;
-    max-width: 12px; max-height: 12px;
+    width: clamp(6px, 1.2vmin, 12px);
+    height: clamp(6px, 1.2vmin, 12px);
     background: rgb(255, 0, 0);
     border-radius: 50%;
     pointer-events: none;
@@ -205,22 +219,21 @@ body::before {
     transition:
         transform 0.4s cubic-bezier(0.05, 0.8, 0.2, 1),
         opacity 0.8s ease-out;
-    z-index: 15;
+    z-index: 80;
 }
 
 /* ------------------------------------------------------
    SCREEN SHAKE
 ------------------------------------------------------ */
 .shake {
-    animation: screenShake 0.15s ease;
+    animation: screenShake .15s ease;
 }
-
-@keyframes screenShake {
-    0%   { transform: translate(0, 0); }
-    25%  { transform: translate(4px, -4px); }
-    50%  { transform: translate(-4px, 4px); }
-    75%  { transform: translate(3px, -3px); }
-    100% { transform: translate(0, 0); }
+@keyframes screenShake{
+    0%{ transform: translate(0,0); }
+    25%{ transform: translate(4px,-4px); }
+    50%{ transform: translate(-4px,4px); }
+    75%{ transform: translate(3px,-3px); }
+    100%{ transform: translate(0,0); }
 }
 
 /* ------------------------------------------------------
@@ -228,76 +241,75 @@ body::before {
 ------------------------------------------------------ */
 .floating-text {
     position: absolute;
-    font-size: 2.2vmin;
+    font-size: clamp(12px, 2.2vmin, 18px);
     opacity: 1;
     pointer-events: none;
     transition: transform 0.8s ease-out, opacity 0.8s ease-out;
     z-index: 200;
 }
-
-/* HIT = GREEN */
 .floating-hit {
-    color: rgb(0, 255, 0);
-    text-shadow: 0 0 10px rgb(0, 255, 0), 0 0 25px rgb(0, 255, 0);
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff, 0 0 25px #0ff;
 }
-
-/* MISS = RED */
 .floating-miss {
-    color: rgb(255, 0, 0);
-    text-shadow: 0 0 10px rgb(255, 0, 0), 0 0 25px rgb(255, 0, 0);
+    color: #f0f;
+    text-shadow: 0 0 10px #f0f, 0 0 25px #f0f;
 }
 
 /* ------------------------------------------------------
    DIFFICULTY SELECT
 ------------------------------------------------------ */
 #difficultySelect {
-    margin-top: -3vmin;
+    margin-top: 0.25rem;     /* tightened to align with label */
     display: flex;
-    gap: 1.5vmin;
+    gap: clamp(8px, 1.6vmin, 18px);
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
 }
 
 .diff-btn {
-    padding: 1.2vmin 2.5vmin;
+    padding: 0.6rem 1.1rem;
     border: 2px solid #0ff;
     border-radius: 10px;
     background: rgba(0,0,0,0.35);
-    font-size: 2.5vmin;
+    font-size: clamp(12px, 2.2vmin, 18px);
     cursor: pointer;
-    opacity: 0.7;
-    transition: 0.15s ease;
+    opacity: 0.85;
+    transition: 0.12s ease;
     text-shadow: 0 0 10px #0ff;
+    user-select: none;
 }
-
-.diff-btn:hover {
-    background: rgba(0,255,255,0.15);
-    opacity: 1;
-}
+.diff-btn:active { transform: scale(.98); }
+.diff-btn:hover { background: rgba(0,255,255,0.12); opacity:1; }
 
 .diff-btn.active {
-    background: rgba(0,255,255,0.25);
+    background: rgba(0,255,255,0.22);
     opacity: 1;
-    box-shadow: 0 0 20px #0ff;
+    box-shadow: 0 0 18px #0ff;
 }
 
-/* ------------------------------------------------------
-   CHAOS MODE FLASH
------------------------------------------------------- */
-.chaos-flash {
-    background: rgba(255, 0, 0, 0.25) !important;
-}
+/* chaos flash style */
+.chaos-flash { background: rgba(255,0,0,0.25) !important; }
 
-/* ------------------------------------------------------
-   DIFFICULTY TITLE
------------------------------------------------------- */
+/* Difficulty title (closer to buttons) */
 .difficulty-title {
     width: 100%;
     text-align: center;
-    font-size: 2.5vmin;
-    margin-bottom: 1vmin;
+    font-size: clamp(13px, 2.2vmin, 18px);
+    margin: 0 0 6px 0;
     color: #0ff;
-    letter-spacing: 0.4vmin;
+    letter-spacing: 0.18rem;
     text-shadow: 0 0 10px rgba(0,255,255,0.7);
-    opacity: 0.85;
+    opacity: 0.95;
+}
+
+/* ------------------------------------------------------
+   SMALL SCREEN ADJUSTMENTS
+------------------------------------------------------ */
+@media (max-width: 420px) {
+    .start-wrapper { gap: clamp(10px, 4vh, 22px); padding: 14px; }
+    .title { font-size: clamp(22px, 9vw, 48px); letter-spacing: .08rem; }
+    #startButton { font-size: clamp(13px, 4.5vw, 20px); padding: 10px 14px; }
+    #difficultySelect { gap: 8px; }
 }

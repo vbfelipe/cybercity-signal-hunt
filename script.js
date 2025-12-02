@@ -1,5 +1,5 @@
 // ------------------------------------------------------
-//  ELEMENTS
+// ELEMENTS
 // ------------------------------------------------------
 const circle = document.getElementById("circle");
 const scoreEl = document.getElementById("score");
@@ -12,11 +12,10 @@ const restartScreen = document.getElementById("restart");
 const restartBox = document.getElementById("restartBox");
 const backBox = document.getElementById("backBox");
 
-// Difficulty buttons
 const diffButtons = document.querySelectorAll(".diff-btn");
 
 // ------------------------------------------------------
-//  DIFFICULTY SETTINGS
+// DIFFICULTY SETTINGS
 // ------------------------------------------------------
 let currentDifficulty = "normal";
 
@@ -31,7 +30,7 @@ let chaosActive = false;
 let MOVE_DELAY = DIFFICULTY.normal.delay;
 
 // ------------------------------------------------------
-//  GAME STATE
+// GAME STATE
 // ------------------------------------------------------
 let score = 0;
 let gameActive = false;
@@ -44,13 +43,13 @@ let lastInputTime = 0;
 const INPUT_DEBOUNCE_MS = 80;
 
 // ------------------------------------------------------
-//  UI
+// UI helpers
 // ------------------------------------------------------
 const updateScore = () => (scoreEl.textContent = `Score: ${score}`);
 const updateTimer = () => (timerEl.textContent = timeLeft);
 
 // ------------------------------------------------------
-//  SCREEN SHAKE
+// SCREEN SHAKE
 // ------------------------------------------------------
 function screenShake() {
     document.body.classList.add("shake");
@@ -58,7 +57,7 @@ function screenShake() {
 }
 
 // ------------------------------------------------------
-//  FLOATING TEXT
+// FLOATING TEXT
 // ------------------------------------------------------
 function showFloatingText(text, x, y, cssClass) {
     const t = document.createElement("div");
@@ -74,7 +73,7 @@ function showFloatingText(text, x, y, cssClass) {
     document.body.appendChild(t);
 
     requestAnimationFrame(() => {
-        t.style.transform = "translateY(-30px)";
+        t.style.transform = "translateY(-28px)";
         t.style.opacity = 0;
     });
 
@@ -82,7 +81,7 @@ function showFloatingText(text, x, y, cssClass) {
 }
 
 // ------------------------------------------------------
-//  CIRCLE MOVEMENT
+// CIRCLE MOVEMENT
 // ------------------------------------------------------
 function moveCircleOnce() {
     const size = circle.offsetWidth || 60;
@@ -94,7 +93,7 @@ function moveCircleOnce() {
     circle.style.left = `${x}px`;
     circle.style.top = `${y}px`;
 
-    // Chaos flash
+    // Chaos flash small chance
     if (chaosActive && Math.random() < 0.12) {
         document.body.classList.add("chaos-flash");
         setTimeout(() => document.body.classList.remove("chaos-flash"), 120);
@@ -116,27 +115,25 @@ function stopMoving() {
 }
 
 // ------------------------------------------------------
-//  TIMER
+// TIMER
 // ------------------------------------------------------
 function startTimer() {
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
         if (!gameActive) return;
-
         timeLeft--;
         updateTimer();
-
         if (timeLeft <= 0) endGame();
     }, 1000);
 }
-
 function stopTimer() {
     clearInterval(timerInterval);
     timerInterval = null;
 }
 
 // ------------------------------------------------------
-//  EXPLOSION
+// EXPLOSION (particles)
+ // same behavior, sizes are responsive thanks to CSS clamp
 // ------------------------------------------------------
 function explodeCircle() {
     stopMoving();
@@ -146,7 +143,6 @@ function explodeCircle() {
     const cy = rect.top + rect.height / 2;
 
     const count = 18;
-
     for (let i = 0; i < count; i++) {
         const p = document.createElement("div");
         p.className = "particle";
@@ -183,7 +179,7 @@ function explodeCircle() {
 }
 
 // ------------------------------------------------------
-//  HIT
+// HIT
 // ------------------------------------------------------
 function handleHit(e) {
     const now = performance.now();
@@ -196,7 +192,7 @@ function handleHit(e) {
     updateScore();
     explodeCircle();
 
-    showFloatingText("SIGNAL_DESTROYED", e.clientX, e.clientY, "floating-hit");
+    showFloatingText("SIGNAL_DESTROYED()", e.clientX, e.clientY, "floating-hit");
 }
 
 circle.addEventListener("pointerdown", e => {
@@ -205,35 +201,67 @@ circle.addEventListener("pointerdown", e => {
 }, { passive: false });
 
 // ------------------------------------------------------
-//  MISS
-// ------------------------------------------------------
+// MISS (don't show miss when start screen is visible)
+ // ignore clicks on UI elements (we only trigger miss when gameActive)
+ // also ignore pointerdown if target is interactive element (button/diff)
+ // ------------------------------------------------------
 document.addEventListener("pointerdown", e => {
     if (!gameActive) return;
 
-    if (e.target !== circle) {
-        showFloatingText("TRACE_LOST", e.clientX, e.clientY, "floating-miss");
-    }
+    // if clicking on the circle itself, that's handled by circle listener
+    if (e.target === circle) return;
+
+    // if clicking a control overlay accidentally (rare during gameplay), ignore
+    if (e.target.closest('#start') || e.target.closest('#restart')) return;
+
+    showFloatingText("TRACE_LOST()", e.clientX, e.clientY, "floating-miss");
 });
 
 // ------------------------------------------------------
-//  GAME FLOW
+// DIFFICULTY application (keeps original sizes but allows CSS clamp)
+ // apply size in px, but CSS clamp will respect min/max
 // ------------------------------------------------------
-function applyDifficulty() {
-    const d = DIFFICULTY[currentDifficulty];
+let currentBtn = document.querySelector('.diff-btn.active');
+function applyDifficulty(mode) {
+    currentDifficulty = mode;
+    const d = DIFFICULTY[mode];
 
     MOVE_DELAY = d.delay;
     chaosActive = d.chaos;
 
+    // set circle size (JS sets preferred px; CSS clamp still enforces min/max)
     circle.style.width = d.size + "px";
     circle.style.height = d.size + "px";
 }
 
+// init difficulty buttons
+diffButtons.forEach(btn => {
+    btn.addEventListener('pointerdown', (ev) => {
+        ev.preventDefault();
+        diffButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyDifficulty(btn.dataset.mode);
+    }, { passive: false });
+
+    // accessibility: keyboard select
+    btn.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault();
+            btn.click();
+        }
+    });
+});
+
+// set default difficulty
+applyDifficulty(currentDifficulty);
+
+// ------------------------------------------------------
+// GAME FLOW
+// ------------------------------------------------------
 function startGame(startTime = 30) {
     score = 0;
     timeLeft = startTime;
     gameActive = true;
-
-    applyDifficulty();
 
     updateScore();
     updateTimer();
@@ -261,12 +289,14 @@ function endGame() {
 }
 
 // ------------------------------------------------------
-//  BUTTONS
+// BUTTONS (start / restart / back)
+ // add keyboard support
 // ------------------------------------------------------
 startButton.addEventListener("pointerdown", e => {
     e.preventDefault();
     startGame();
 }, { passive: false });
+startButton.addEventListener('keydown', e => { if (e.key === 'Enter') startGame(); });
 
 restartBox.addEventListener("pointerdown", e => {
     e.preventDefault();
@@ -280,18 +310,7 @@ backBox.addEventListener("pointerdown", e => {
 }, { passive: false });
 
 // ------------------------------------------------------
-//  DIFFICULTY CHANGE
-// ------------------------------------------------------
-diffButtons.forEach(btn => {
-    btn.addEventListener("pointerdown", () => {
-        diffButtons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentDifficulty = btn.dataset.mode;
-    });
-});
-
-// ------------------------------------------------------
-//  RESIZE FIX
+// RESIZE safety: keep circle inside viewport when viewport changes
 // ------------------------------------------------------
 window.addEventListener("resize", () => {
     if (circle.style.display === "none") return;
