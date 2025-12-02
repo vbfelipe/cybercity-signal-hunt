@@ -18,8 +18,8 @@ let currentDifficulty = "normal";
 const DIFFICULTY = {
     easy:   { delay: 900, size: 90, chaos: false },
     normal: { delay: 700, size: 60, chaos: false },
-    hard:   { delay: 500, size: 45, chaos: false },
-    chaos:  { delay: 300, size: 60, chaos: true }
+    hard:   { delay: 500, size: 40, chaos: false },
+    chaos:  { delay: 350, size: 30, chaos: true }
 };
 
 let MOVE_DELAY = DIFFICULTY.normal.delay;
