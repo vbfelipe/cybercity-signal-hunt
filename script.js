@@ -40,6 +40,8 @@ let timerInterval = null;
 const INPUT_DEBOUNCE_MS = 80;
 let lastInputTime = 0;
 
+let combo = 0;
+
 // ------------------------------------------------------
 // UI UPDATES
 // ------------------------------------------------------
@@ -166,8 +168,35 @@ function handleHit(e) {
 
     score++;
     updateScore();
+
+    // COMBO LOGIC
+    combo++;
+    if (combo > 1) {
+        showComboText(e.clientX + 50, e.clientY);
+    }
+
     explodeCircle();
     showFloatingText("SIGNAL_DESTROYED", e.clientX, e.clientY, "floating-hit");
+}
+
+function showComboText() {
+    const t = document.createElement("div");
+    t.className = "floating-text floating-combo";
+    t.textContent = `COMBO x${combo}`;
+
+    // place centered at the top
+    t.style.left = `50%`;
+    t.style.top = `8vh`;
+    t.style.transform = "translateX(-50%)";
+
+    document.body.appendChild(t);
+
+    requestAnimationFrame(() => {
+        t.style.transform = "translate(-50%, -40px)";
+        t.style.opacity = "0";
+    });
+
+    setTimeout(() => t.remove(), 850);
 }
 
 // ------------------------------------------------------
@@ -175,10 +204,29 @@ function handleHit(e) {
 // ------------------------------------------------------
 circle.addEventListener("pointerdown", e => { e.preventDefault(); handleHit(e); });
 
-document.addEventListener("pointerdown", e => {
+// --- FIXED MISS DETECTION + COMBO RESET ---
+document.addEventListener("pointerup", e => {
     if (!gameActive) return;
-    if (e.target !== circle) showFloatingText("TRACE_LOST", e.clientX, e.clientY, "floating-miss");
+
+    // If the hit handler already fired, don't count this as a miss
+    if (e.target === circle) return;
+
+    // Distance check to avoid false miss when circle just moved
+    const rect = circle.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    // Only count as miss if the tap is clearly far from the target
+    if (dist > rect.width * 0.6) {
+        combo = 0;
+        showFloatingText("TRACE_LOST", e.clientX, e.clientY, "floating-miss");
+    }
 });
+
 
 // ------------------------------------------------------
 // DIFFICULTY AND GAME CONTROL
@@ -208,6 +256,9 @@ function startGame() {
 
     startMoving();
     startTimer();
+
+    combo = 0;
+
 }
 
 function endGame() {

@@ -182,6 +182,7 @@ html, body {
 .floating-text {
     position: absolute;
     font-size: clamp(12px, 2.5vmin, 20px);
+    font-weight: bold;
     pointer-events: none;
     z-index: 200;
     transition: transform 0.8s ease-out, opacity 0.8s ease-out;
@@ -196,6 +197,12 @@ html, body {
 .floating-miss {
     color: #f00;
     text-shadow: 0 0 8px #f00, 0 0 16px #f00;
+}
+
+.floating-combo {
+    color: #ff0;
+    text-shadow: 0 0 8px #ff0, 0 0 16px #ff0;
+    font-size: clamp(24px, 5vmin, 40px);
 }
 
 /* Particles */
