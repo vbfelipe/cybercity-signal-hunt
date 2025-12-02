@@ -190,8 +190,8 @@ html, body {
 
 /* Floating text colors */
 .floating-hit {
-    color: #0f0;
-    text-shadow: 0 0 8px #0f0, 0 0 16px #0f0;
+    color: #0ff;
+    text-shadow: 0 0 8px #0ff, 0 0 16px #0ff;
 }
 
 .floating-miss {
