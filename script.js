@@ -16,10 +16,10 @@ const diffButtons = document.querySelectorAll(".diff-btn");
 let currentDifficulty = "normal";
 
 const DIFFICULTY = {
-    easy:   { delay: 900, size: 90, chaos: false },
+    easy:   { delay: 800, size: 90, chaos: false },
     normal: { delay: 700, size: 60, chaos: false },
-    hard:   { delay: 500, size: 40, chaos: false },
-    chaos:  { delay: 350, size: 30, chaos: true }
+    hard:   { delay: 600, size: 40, chaos: false },
+    chaos:  { delay: 500, size: 30, chaos: true }
 };
 
 let MOVE_DELAY = DIFFICULTY.normal.delay;
