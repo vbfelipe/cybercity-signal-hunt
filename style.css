@@ -18,26 +18,14 @@ html, body {
     box-sizing: border-box;
 }
 
-/* ------------------------------------------------------
-   BACKGROUND GRID
------------------------------------------------------- */
-body::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-size: 6vmin 6vmin;
-    background:
-        repeating-linear-gradient(to right, rgba(0,255,255,0.08) 0 2px, transparent 2px 40px),
-        repeating-linear-gradient(to bottom, rgba(255,0,255,0.08) 0 2px, transparent 2px 40px);
-    animation: gridShift 1.5s linear infinite;
-    will-change: transform;
-    z-index: 50;
+#matrixCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
     pointer-events: none;
-}
-
-@keyframes gridShift {
-    0%, 100% { transform: translate(0,0); }
-    50% { transform: translate(3px,3px); }
 }
 
 /* ------------------------------------------------------
@@ -63,12 +51,9 @@ body::before {
     justify-content: center;
     align-items: center;
     text-align: center;
-
-    /* Cyberpunk city background */
     background: url('city-bg.jpg') center/cover no-repeat;
-    background-color: rgba(0,0,0,0.65); /* dark overlay for readability */
+    background-color: rgba(0,0,0,0.65);
     background-blend-mode: darken;
-
     z-index: 100;
 }
 
@@ -83,7 +68,7 @@ body::before {
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: rgba(0,0,0,0.85); /* keep solid for clarity */
+    background: rgba(0,0,0,0.85);
     z-index: 100;
 }
 
@@ -158,15 +143,8 @@ body::before {
 }
 
 /* ------------------------------------------------------
-   RESTART SCREEN
+   RESTART SCREEN BUTTONS
 ------------------------------------------------------ */
-#restart {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
 #restartBox, #backBox {
     padding: 2vmin 4vmin;
     margin-top: 2vmin;
@@ -195,10 +173,9 @@ body::before {
     border-radius: 50%;
     background: red;
     display: none;
-    z-index: 10;
+    z-index: 999;
     transition: transform 0.1s ease, opacity 0.1s;
     box-shadow: 0 0 30px red;
-    z-index: 999; /* bring it on top of everything */
 }
 
 /* Floating text */
@@ -212,12 +189,12 @@ body::before {
 
 /* Floating text colors */
 .floating-hit {
-    color: #0f0; /* bright green */
+    color: #0f0;
     text-shadow: 0 0 8px #0f0, 0 0 16px #0f0;
 }
 
 .floating-miss {
-    color: #f00; /* bright red */
+    color: #f00;
     text-shadow: 0 0 8px #f00, 0 0 16px #f00;
 }
 
@@ -245,6 +222,3 @@ body::before {
     75% { transform: translate(4px,2px); }
     100% { transform: translate(0,0); }
 }
-
-/* Chaos flash */
-.chaos-flash { background: rgba(255,0,0,0.25) !important; }
