@@ -291,12 +291,12 @@ function endGame() {
     btnContainer.style.marginTop = "1.5vmin";
 
     const restartBtn = document.createElement("div");
-    restartBtn.textContent = "RESTART";
+    restartBtn.textContent = "REPLAY";
     restartBtn.className = "restart-btn";
     restartBtn.addEventListener("pointerdown", startGame);
 
     const backBtn = document.createElement("div");
-    backBtn.textContent = "BACK";
+    backBtn.textContent = "RETURN";
     backBtn.className = "restart-btn";
     backBtn.addEventListener("pointerdown", () => {
         restartScreen.style.display = "none";
