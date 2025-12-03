@@ -15,6 +15,11 @@ const backBox = document.getElementById("backBox");
 const diffButtons = document.querySelectorAll(".diff-btn");
 
 // ------------------------------------------------------
+// DEVICE DETECTION
+// ------------------------------------------------------
+const isMobile = /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
+
+// ------------------------------------------------------
 // DIFFICULTY SETTINGS
 // ------------------------------------------------------
 let currentDifficulty = "normal";
@@ -94,7 +99,12 @@ function moveCircleOnce() {
 
 function startMoving() {
     clearInterval(moveInterval);
-    moveInterval = setInterval(() => gameActive && moveCircleOnce(), MOVE_DELAY);
+
+    // Adjust reaction time for desktop vs mobile
+    const reactionMultiplier = isMobile ? 1 : 1.5; // desktop slower
+    const adjustedDelay = MOVE_DELAY * reactionMultiplier;
+
+    moveInterval = setInterval(() => gameActive && moveCircleOnce(), adjustedDelay);
     moveCircleOnce();
 }
 
@@ -172,7 +182,7 @@ function handleHit(e) {
     // COMBO LOGIC
     combo++;
     if (combo > 1) {
-        showComboText(e.clientX + 50, e.clientY);
+        showComboText();
     }
 
     explodeCircle();
@@ -204,14 +214,12 @@ function showComboText() {
 // ------------------------------------------------------
 circle.addEventListener("pointerdown", e => { e.preventDefault(); handleHit(e); });
 
-// --- FIXED MISS DETECTION + COMBO RESET ---
+// --- MISS DETECTION + COMBO RESET ---
 document.addEventListener("pointerup", e => {
     if (!gameActive) return;
 
-    // If the hit handler already fired, don't count this as a miss
     if (e.target === circle) return;
 
-    // Distance check to avoid false miss when circle just moved
     const rect = circle.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
@@ -220,13 +228,11 @@ document.addEventListener("pointerup", e => {
     const dy = e.clientY - cy;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
-    // Only count as miss if the tap is clearly far from the target
     if (dist > rect.width * 0.6) {
         combo = 0;
         showFloatingText("TRACE_LOST", e.clientX, e.clientY, "floating-miss");
     }
 });
-
 
 // ------------------------------------------------------
 // DIFFICULTY AND GAME CONTROL
@@ -258,7 +264,6 @@ function startGame() {
     startTimer();
 
     combo = 0;
-
 }
 
 function endGame() {
