@@ -57,21 +57,6 @@ html, body {
     z-index: 100;
 }
 
-/* ------------------------------------------------------
-   RESTART SCREEN
------------------------------------------------------- */
-#restart {
-    position: fixed;
-    inset: 0;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: rgba(0,0,0,0.85);
-    z-index: 100;
-}
-
 .start-wrapper {
     display: flex;
     flex-direction: column;
@@ -143,12 +128,25 @@ html, body {
 }
 
 /* ------------------------------------------------------
-   RESTART SCREEN BUTTONS
+   RESTART SCREEN
 ------------------------------------------------------ */
-#restartBox, #backBox {
-    padding: 2vmin 4vmin;
+#restart {
+    position: fixed;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+}
+
+/* Restart buttons unified style */
+.restart-btn {
+    padding: 2vmin 6vmin;
     margin-top: 2vmin;
-    font-size: clamp(16px, 4vmin, 30px);
+    font-size: clamp(16px, 4vmin, 28px);
     border: 2px solid #0ff;
     border-radius: 12px;
     background: rgba(0,0,0,0.5);
@@ -157,7 +155,10 @@ html, body {
     transition: 0.15s;
 }
 
-#restartBox:hover, #backBox:hover { transform: scale(1.1); }
+.restart-btn:hover {
+    transform: scale(1.12);
+    box-shadow: 0 0 25px #0ff;
+}
 
 /* ------------------------------------------------------
    TARGET CIRCLE

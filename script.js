@@ -4,14 +4,9 @@
 const circle = document.getElementById("circle");
 const scoreEl = document.getElementById("score");
 const timerEl = document.getElementById("timer");
-
 const startScreen = document.getElementById("start");
 const startButton = document.getElementById("startButton");
-
 const restartScreen = document.getElementById("restart");
-const restartBox = document.getElementById("restartBox");
-const backBox = document.getElementById("backBox");
-
 const diffButtons = document.querySelectorAll(".diff-btn");
 
 // ------------------------------------------------------
@@ -23,7 +18,6 @@ const isMobile = /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.u
 // DIFFICULTY SETTINGS
 // ------------------------------------------------------
 let currentDifficulty = "normal";
-
 const DIFFICULTY = {
     easy:   { delay: 750, size: 90, chaos: false },
     normal: { delay: 650, size: 60, chaos: false },
@@ -34,18 +28,11 @@ const DIFFICULTY = {
 let MOVE_DELAY = DIFFICULTY.normal.delay;
 let chaosActive = false;
 let matrixColor = "rgba(0, 255, 0, 0.4)";
-
-let score = 0;
-let gameActive = false;
-let timeLeft = 30;
-
-let moveInterval = null;
-let timerInterval = null;
-
+let score = 0, timeLeft = 30, gameActive = false;
+let combo = 0, maxCombo = 0, misses = 0;
+let moveInterval = null, timerInterval = null;
 const INPUT_DEBOUNCE_MS = 80;
 let lastInputTime = 0;
-
-let combo = 0;
 
 // ------------------------------------------------------
 // UI UPDATES
@@ -76,7 +63,23 @@ function showFloatingText(text, x, y, cssClass) {
         t.style.transform = "translateY(-35px)";
         t.style.opacity = 0;
     });
+    setTimeout(() => t.remove(), 850);
+}
 
+function showComboText() {
+    if (combo < 2) return;
+    const t = document.createElement("div");
+    t.className = "floating-text floating-combo";
+    t.textContent = `COMBO x${combo}`;
+    t.style.left = "50%";
+    t.style.top = "8vh";
+    t.style.transform = "translateX(-50%)";
+    document.body.appendChild(t);
+
+    requestAnimationFrame(() => {
+        t.style.transform = "translate(-50%, -40px)";
+        t.style.opacity = 0;
+    });
     setTimeout(() => t.remove(), 850);
 }
 
@@ -84,33 +87,24 @@ function showFloatingText(text, x, y, cssClass) {
 // MOVE CIRCLE
 // ------------------------------------------------------
 function moveCircleOnce() {
-    const size = circle.offsetWidth;
-    const pad = 10;
-
-    let x = Math.random() * (window.innerWidth - size - pad * 2) + pad;
-    let y = Math.random() * (window.innerHeight - size - pad * 2) + pad;
-
+    const size = circle.offsetWidth, pad = 10;
+    let x = Math.random() * (window.innerWidth - size - pad*2) + pad;
+    let y = Math.random() * (window.innerHeight - size - pad*2) + pad;
     x = Math.min(Math.max(x, pad), window.innerWidth - size - pad);
     y = Math.min(Math.max(y, pad), window.innerHeight - size - pad);
-
     circle.style.left = `${x}px`;
     circle.style.top = `${y}px`;
 }
 
 function startMoving() {
     clearInterval(moveInterval);
-
-    // Adjust reaction time for desktop vs mobile
-    const reactionMultiplier = isMobile ? 1 : 1.5; // desktop slower
+    const reactionMultiplier = isMobile ? 1 : 1.5;
     const adjustedDelay = MOVE_DELAY * reactionMultiplier;
-
     moveInterval = setInterval(() => gameActive && moveCircleOnce(), adjustedDelay);
     moveCircleOnce();
 }
 
-function stopMoving() {
-    clearInterval(moveInterval);
-}
+function stopMoving() { clearInterval(moveInterval); }
 
 // ------------------------------------------------------
 // TIMER
@@ -119,10 +113,8 @@ function startTimer() {
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
         if (!gameActive) return;
-
         timeLeft--;
         updateTimer();
-
         if (timeLeft <= 0) endGame();
     }, 1000);
 }
@@ -132,7 +124,6 @@ function startTimer() {
 // ------------------------------------------------------
 function explodeCircle() {
     stopMoving();
-
     const rect = circle.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
@@ -153,7 +144,6 @@ function explodeCircle() {
             p.style.transform = `translate(${dx}px, ${dy}px) scale(0.4)`;
             p.style.opacity = 0;
         });
-
         setTimeout(() => p.remove(), 700);
     }
 
@@ -177,36 +167,12 @@ function handleHit(e) {
     if (!gameActive) return;
 
     score++;
-    updateScore();
-
-    // COMBO LOGIC
     combo++;
-    if (combo > 1) {
-        showComboText();
-    }
-
+    if (combo > maxCombo) maxCombo = combo;
+    updateScore();
+    showComboText();
     explodeCircle();
     showFloatingText("SIGNAL_DESTROYED", e.clientX, e.clientY, "floating-hit");
-}
-
-function showComboText() {
-    const t = document.createElement("div");
-    t.className = "floating-text floating-combo";
-    t.textContent = `COMBO x${combo}`;
-
-    // place centered at the top
-    t.style.left = `50%`;
-    t.style.top = `8vh`;
-    t.style.transform = "translateX(-50%)";
-
-    document.body.appendChild(t);
-
-    requestAnimationFrame(() => {
-        t.style.transform = "translate(-50%, -40px)";
-        t.style.opacity = "0";
-    });
-
-    setTimeout(() => t.remove(), 850);
 }
 
 // ------------------------------------------------------
@@ -214,22 +180,16 @@ function showComboText() {
 // ------------------------------------------------------
 circle.addEventListener("pointerdown", e => { e.preventDefault(); handleHit(e); });
 
-// --- MISS DETECTION + COMBO RESET ---
 document.addEventListener("pointerup", e => {
-    if (!gameActive) return;
-
-    if (e.target === circle) return;
-
+    if (!gameActive || e.target === circle) return;
     const rect = circle.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-
-    const dx = e.clientX - cx;
-    const dy = e.clientY - cy;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    if (dist > rect.width * 0.6) {
+    const dx = e.clientX - (rect.left + rect.width/2);
+    const dy = e.clientY - (rect.top + rect.height/2);
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist > rect.width*0.6) {
+        if (combo > maxCombo) maxCombo = combo;
         combo = 0;
+        misses++;
         showFloatingText("TRACE_LOST", e.clientX, e.clientY, "floating-miss");
     }
 });
@@ -243,12 +203,11 @@ function applyDifficulty() {
     chaosActive = d.chaos;
     circle.style.width = `${d.size}px`;
     circle.style.height = `${d.size}px`;
-
-    matrixColor = chaosActive ? "rgba(255, 0, 0, 0.4)" : "rgba(0, 255, 0, 0.4)";
+    matrixColor = chaosActive ? "rgba(255,0,0,0.4)" : "rgba(0,255,0,0.4)";
 }
 
 function startGame() {
-    score = 0;
+    score = combo = maxCombo = misses = 0;
     timeLeft = 30;
     gameActive = true;
 
@@ -262,8 +221,6 @@ function startGame() {
 
     startMoving();
     startTimer();
-
-    combo = 0;
 }
 
 function endGame() {
@@ -271,20 +228,57 @@ function endGame() {
     stopMoving();
     circle.style.display = "none";
 
+    restartScreen.innerHTML = "";
+
+    // Title
+    const title = document.createElement("div");
+    title.textContent = "GAME OVER!";
+    title.style.fontSize = "clamp(24px, 6vmin, 48px)";
+    title.style.fontWeight = "bold";
+    title.style.marginBottom = "2vmin";
+    title.style.color = "#f00";
+    title.style.textShadow = "0 0 15px #f00, 0 0 30px #f00";
+    restartScreen.appendChild(title);
+
+    // Stats
+    const stats = document.createElement("div");
+    stats.innerHTML = `Hits: ${score}<br>Misses: ${misses}<br>Max Combo: ${maxCombo}`;
+    stats.style.fontSize = "clamp(14px,4vmin,22px)";
+    stats.style.marginBottom = "3vmin";
+    stats.style.color = "#0ff";
+    stats.style.textShadow = "0 0 7.5px #0ff, 0 0 15px #0ff";
+    stats.style.textAlign = "center";
+    restartScreen.appendChild(stats);
+
+    // Buttons
+    const btnContainer = document.createElement("div");
+    btnContainer.style.display = "flex";
+    btnContainer.style.gap = "4vmin";
+    btnContainer.style.justifyContent = "center";
+
+    const restartBtn = document.createElement("div");
+    restartBtn.textContent = "RESTART";
+    restartBtn.className = "restart-btn";
+    restartBtn.addEventListener("pointerdown", startGame);
+
+    const backBtn = document.createElement("div");
+    backBtn.textContent = "BACK";
+    backBtn.className = "restart-btn";
+    backBtn.addEventListener("pointerdown", () => {
+        restartScreen.style.display = "none";
+        startScreen.style.display = "flex";
+    });
+
+    btnContainer.appendChild(restartBtn);
+    btnContainer.appendChild(backBtn);
+    restartScreen.appendChild(btnContainer);
     restartScreen.style.display = "flex";
-    restartBox.textContent = `SCORE: ${score} — RESTART?`;
 }
 
 // ------------------------------------------------------
 // BUTTONS
 // ------------------------------------------------------
 startButton.addEventListener("pointerdown", e => { e.preventDefault(); startGame(); });
-restartBox.addEventListener("pointerdown", e => { e.preventDefault(); startGame(); });
-backBox.addEventListener("pointerdown", e => {
-    e.preventDefault();
-    restartScreen.style.display = "none";
-    startScreen.style.display = "flex";
-});
 
 diffButtons.forEach(btn => {
     btn.addEventListener("pointerdown", () => {
@@ -299,38 +293,31 @@ diffButtons.forEach(btn => {
 // ------------------------------------------------------
 const canvas = document.getElementById('matrixCanvas');
 const ctx = canvas.getContext('2d');
-
 let width = canvas.width = window.innerWidth;
 let height = canvas.height = window.innerHeight;
-
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@$%&*";
 const fontSize = 18;
 let columns = Math.floor(width / fontSize);
-const drops = Array.from({ length: columns }, () => Math.random() * height);
+const drops = Array.from({length: columns}, () => Math.random()*height);
 
 function drawMatrix() {
     ctx.fillStyle = chaosActive ? "rgba(0,0,0,0.12)" : "rgba(0,0,0,0.05)";
-    ctx.fillRect(0, 0, width, height);
-
+    ctx.fillRect(0,0,width,height);
     ctx.fillStyle = matrixColor;
     ctx.font = `${fontSize}px monospace`;
 
-    for (let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillText(text, i * fontSize, drops[i]);
+    for (let i=0;i<drops.length;i++){
+        const text = letters.charAt(Math.floor(Math.random()*letters.length));
+        ctx.fillText(text, i*fontSize, drops[i]);
+        drops[i] += chaosActive ? fontSize*(0.8 + Math.random()*0.5) : fontSize;
 
-        drops[i] += chaosActive ? fontSize * (0.8 + Math.random() * 0.5) : fontSize;
+        if(drops[i] > height && Math.random() > (chaosActive ? 0.85 : 0.975)) drops[i] = 0;
 
-        if (drops[i] > height && Math.random() > (chaosActive ? 0.85 : 0.975)) {
-            drops[i] = 0;
-        }
-
-        if (chaosActive) {
-            const jitter = Math.random() * fontSize - fontSize / 2;
-            ctx.fillText(text, i * fontSize + jitter, drops[i]);
+        if(chaosActive){
+            const jitter = Math.random()*fontSize - fontSize/2;
+            ctx.fillText(text, i*fontSize + jitter, drops[i]);
         }
     }
-
     requestAnimationFrame(drawMatrix);
 }
 
@@ -342,14 +329,9 @@ function resizeCanvas() {
     height = canvas.height = window.innerHeight;
 
     const newColumns = Math.floor(width / fontSize);
-
-    if (newColumns > drops.length) {
-        for (let i = drops.length; i < newColumns; i++) {
-            drops[i] = Math.random() * height;
-        }
-    } else {
-        drops.length = newColumns;
-    }
+    if(newColumns > drops.length){
+        for(let i=drops.length;i<newColumns;i++) drops[i] = Math.random()*height;
+    } else drops.length = newColumns;
 
     moveCircleOnce();
 }
@@ -357,6 +339,6 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 
 // ------------------------------------------------------
-// START MATRIX ANIMATION
+// START MATRIX
 // ------------------------------------------------------
 drawMatrix();
