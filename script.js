@@ -223,6 +223,151 @@ function startGame() {
     startTimer();
 }
 
+// ------------------------------------------------------
+// HIGH SCORE FUNCTIONS
+// ------------------------------------------------------
+function saveHighScore(initials, score) {
+    const scores = JSON.parse(localStorage.getItem("highScores") || "[]");
+
+    // Add new score
+    scores.push({ initials, score });
+
+    // Sort by highest score
+    scores.sort((a, b) => b.score - a.score);
+
+    // Keep only top 10
+    const trimmed = scores.slice(0, 10);
+
+    // Save back to localStorage
+    localStorage.setItem("highScores", JSON.stringify(trimmed));
+}
+
+function displayHighScores(container = restartScreen) {
+    const scores = JSON.parse(localStorage.getItem("highScores") || "[]");
+
+    // Remove previous container if exists
+    const old = container.querySelector(".high-score-list");
+    if(old) old.remove();
+
+    const hsContainer = document.createElement("div");
+    hsContainer.className = "high-score-list";
+    hsContainer.style.marginTop = "2vmin";
+    hsContainer.style.color = "#0ff";
+    hsContainer.style.fontSize = "clamp(14px,3vmin,22px)";
+    hsContainer.style.textAlign = "center";
+
+    hsContainer.innerHTML = "<strong>HIGH SCORES:</strong><br>";
+
+    if(scores.length === 0) hsContainer.innerHTML += "No scores yet.";
+    else scores.forEach((s,i) => hsContainer.innerHTML += `${i+1}. ${s.initials} — ${s.score}<br>`);
+
+    container.appendChild(hsContainer);
+}
+
+function showHighScoreInput() {
+    const scoreInputContainer = document.createElement("div");
+    scoreInputContainer.style.marginTop = "2vmin";
+    scoreInputContainer.style.textAlign = "center";
+
+    // Label
+    const label = document.createElement("div");
+    label.textContent = "Enter your initials (3 letters A-Z):";
+    label.style.color = "#0ff";
+    label.style.fontSize = "clamp(14px,3vmin,20px)";
+    label.style.marginBottom = "1vmin";
+
+    // Input
+    const input = document.createElement("input");
+    input.type = "text";
+    input.maxLength = 3;
+    input.style.textTransform = "uppercase";
+    input.style.fontSize = "clamp(16px,4vmin,28px)";
+    input.style.padding = "0.5em";
+    input.style.width = "6ch";
+    input.style.textAlign = "center";
+    input.style.border = "2px solid #0ff";
+    input.style.borderRadius = "8px";
+    input.style.background = "rgba(0,0,0,0.4)";
+    input.style.color = "#0ff";
+
+    // Allow only A-Z
+    input.addEventListener("input", () => {
+        input.value = input.value.toUpperCase().replace(/[^A-Z]/g, "");
+        clearWarning();
+    });
+
+    // Warning - with fade + fixed height
+    const warning = document.createElement("div");
+    warning.style.color = "#f00";
+    warning.style.marginTop = "4vmin";
+    warning.style.fontSize = "clamp(14px,3vmin,20px)";
+    warning.style.minHeight = "1.5em";
+    warning.style.opacity = 0;
+    warning.style.transition = "opacity 0.3s ease";
+
+    let warningTimer = null;
+
+    function clearWarning() {
+        if (warningTimer) clearTimeout(warningTimer);
+        warningTimer = null;
+        warning.textContent = "";
+        warning.style.opacity = 0;
+    }
+
+    function showWarning(text) {
+        clearWarning();
+        warning.textContent = text;
+        requestAnimationFrame(() => {
+            warning.style.opacity = 1;
+        });
+        warningTimer = setTimeout(() => {
+            warning.style.opacity = 0;
+            warningTimer = null;
+        }, 2000);
+    }
+
+    // Save button
+    const saveBtn = document.createElement("div");
+    saveBtn.textContent = "SAVE SCORE";
+    saveBtn.className = "restart-btn";
+    saveBtn.style.marginTop = "1.5vmin";
+
+    saveBtn.addEventListener("pointerdown", () => {
+        const raw = input.value;
+
+        if (raw.length === 0) {
+            showWarning("Please enter at least one letter!");
+            return;
+        }
+
+        const padded = raw.padEnd(3, "_"); // ALWAYS compare padded
+
+        const scores = JSON.parse(localStorage.getItem("highScores") || "[]");
+        const exists = scores.some(s => s.initials === padded);
+
+        if (exists) {
+            showWarning("Please choose another name!");
+            return;
+        }
+
+        saveHighScore(padded, score);
+        scoreInputContainer.remove();
+        displayHighScores();
+    });
+
+    // Append
+    scoreInputContainer.appendChild(label);
+    scoreInputContainer.appendChild(input);
+    scoreInputContainer.appendChild(saveBtn);
+    scoreInputContainer.appendChild(warning);
+
+    restartScreen.appendChild(scoreInputContainer);
+    input.focus();
+}
+
+// ------------------------------------------------------
+// END GAME
+// ------------------------------------------------------
 function endGame() {
     gameActive = false;
     stopMoving();
@@ -233,24 +378,24 @@ function endGame() {
     // Title
     const title = document.createElement("div");
     title.textContent = "GAME OVER!";
-    title.style.fontSize = "clamp(24px, 6vmin, 48px)";
+    title.style.fontSize = "clamp(24px,6vmin,48px)";
     title.style.fontWeight = "bold";
     title.style.marginBottom = "2vmin";
     title.style.color = "#f00";
-    title.style.textShadow = "0 0 15px #f00, 0 0 30px #f00";
+    title.style.textShadow = "0 0 15px #f00,0 0 30px #f00";
     restartScreen.appendChild(title);
 
     // Stats
     const stats = document.createElement("div");
-    stats.innerHTML = `Hits: ${score}<br>Misses: ${misses}<br>Max Combo: ${maxCombo}`;
+    stats.innerHTML = `Score: ${score}<br>Misses: ${misses}<br>Max Combo: ${maxCombo}`;
     stats.style.fontSize = "clamp(14px,4vmin,22px)";
     stats.style.marginBottom = "3vmin";
     stats.style.color = "#0ff";
-    stats.style.textShadow = "0 0 7.5px #0ff, 0 0 15px #0ff";
+    stats.style.textShadow = "0 0 7.5px #0ff,0 0 15px #0ff";
     stats.style.textAlign = "center";
     restartScreen.appendChild(stats);
 
-    // Buttons
+    // Restart & Back buttons
     const btnContainer = document.createElement("div");
     btnContainer.style.display = "flex";
     btnContainer.style.gap = "4vmin";
@@ -272,14 +417,29 @@ function endGame() {
     btnContainer.appendChild(restartBtn);
     btnContainer.appendChild(backBtn);
     restartScreen.appendChild(btnContainer);
+
+    // Save score button
+    const saveScoreBtn = document.createElement("div");
+    saveScoreBtn.textContent = "Save Score";
+    saveScoreBtn.className = "restart-btn";
+    saveScoreBtn.style.marginBottom = "2vmin";
+    restartScreen.appendChild(saveScoreBtn);
+
+    saveScoreBtn.addEventListener("pointerdown", () => {
+        saveScoreBtn.remove();
+        showHighScoreInput();
+    });
+
+    displayHighScores();
     restartScreen.style.display = "flex";
+    restartScreen.style.flexDirection = "column";
+    restartScreen.style.alignItems = "center";
 }
 
 // ------------------------------------------------------
 // BUTTONS
 // ------------------------------------------------------
 startButton.addEventListener("pointerdown", e => { e.preventDefault(); startGame(); });
-
 diffButtons.forEach(btn => {
     btn.addEventListener("pointerdown", () => {
         diffButtons.forEach(b => b.classList.remove("active"));
@@ -335,7 +495,6 @@ function resizeCanvas() {
 
     moveCircleOnce();
 }
-
 window.addEventListener('resize', resizeCanvas);
 
 // ------------------------------------------------------
