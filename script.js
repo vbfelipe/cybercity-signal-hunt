@@ -151,6 +151,33 @@ function startTimer() {
 // ------------------------------------------------------
 // EXPLOSION EFFECT
 // ------------------------------------------------------
+function dataExplosion(cx, cy) {
+    const chars = "01∆Ω¥$%#@&*/≠≡πψ§{}[]<>+-;".split("");
+    const count = 60;
+
+    for (let i = 0; i < count; i++) {
+        const el = document.createElement("div");
+        el.className = "data-char";
+        el.textContent = chars[Math.floor(Math.random() * chars.length)];
+
+        el.style.left = cx + "px";
+        el.style.top = cy + "px";
+
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 60 + Math.random() * 140;
+
+        const dx = Math.cos(angle) * dist;
+        const dy = Math.sin(angle) * dist;
+
+        el.style.setProperty("--dx", dx + "px");
+        el.style.setProperty("--dy", dy + "px");
+
+        document.body.appendChild(el);
+
+        setTimeout(() => el.remove(), 650);
+    }
+}
+
 function explodeCircle() {
     stopMoving();
 
@@ -158,30 +185,14 @@ function explodeCircle() {
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
 
-    for (let i = 0; i < 54; i++) {
-        const p = document.createElement("div");
-        p.className = "particle";
-        p.style.left = `${cx}px`;
-        p.style.top = `${cy}px`;
-        document.body.appendChild(p);
-
-        const angle = Math.random() * Math.PI * 2;
-        const dist = 80 + Math.random() * 70;
-        const dx = Math.cos(angle) * dist;
-        const dy = Math.sin(angle) * dist;
-
-        requestAnimationFrame(() => {
-            p.style.transform = `translate(${dx}px, ${dy}px) scale(0.4)`;
-            p.style.opacity = 0;
-        });
-        setTimeout(() => p.remove(), 700);
-    }
+    dataExplosion(cx, cy);
 
     circle.style.opacity = 0;
+
     setTimeout(() => {
         circle.style.opacity = 1;
         startMoving();
-    }, 150);
+    }, 140);
 
     screenShake();
 }
