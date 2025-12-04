@@ -175,11 +175,37 @@ html, body {
     max-width: 90px;
     max-height: 90px;
     border-radius: 50%;
-    background: red;
+    background: radial-gradient(circle at 30% 30%, #ff6b6b, red);
+    background-size: 100% 100%;
     display: none;
     z-index: 999;
-    transition: transform 0.1s ease, opacity 0.1s;
+    transition: opacity 0.09s;
     box-shadow: 0 0 30px red;
+
+    /* Circle animation */
+    animation:
+        jelly 0.25s ease-in-out infinite,
+        liquid 0.50s ease-in-out infinite,
+        flicker 0.25s infinite;
+
+}
+
+@keyframes jelly {
+    0%   { transform: scale(1) translate(0, 0); }
+    30%  { transform: scale(1.08, 0.92) translate(1px, -1px); }
+    60%  { transform: scale(0.95, 1.05) translate(-1px, 1px); }
+    100% { transform: scale(1) translate(0, 0); }
+}
+
+@keyframes liquid {
+    0%   { background-size: 100% 100%; }
+    50%  { background-size: 103% 97%; }
+    100% { background-size: 100% 100%; }
+}
+
+@keyframes flicker {
+    0%, 100% { filter: brightness(1); }
+    50%      { filter: brightness(1.15); }
 }
 
 /* Floating text */
