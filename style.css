@@ -1,5 +1,5 @@
 /* ------------------------------------------------------
-   GLOBAL — MOBILE FRIENDLY
+   GLOBAL STYLE
 ------------------------------------------------------ */
 html, body {
     margin: 0;
@@ -103,7 +103,6 @@ html, body {
     box-shadow: 0 0 15px #0ff;
 }
 
-/* Start button */
 #startButton {
     margin-top: 4vmin;
     padding: 2vmin 6vmin;
@@ -230,9 +229,7 @@ html, body {
     font-size: clamp(24px, 5vmin, 40px);
 }
 
-/* ------------------------------------------------------
-   EXTRA
------------------------------------------------------- */
+/* Explosion Canvas */
 #explosionCanvas {
     position: fixed;
     inset: 0;
