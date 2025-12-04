@@ -1,5 +1,3 @@
-// script.js — cleaned & optimized (Option B: separate explosion canvas)
-// IIFE to avoid leaking globals
 (() => {
   // ------------------------------------------------------
   // ELEMENTS
@@ -12,7 +10,6 @@
   const restartScreen = document.getElementById("restart");
   const diffButtons = document.querySelectorAll(".diff-btn");
 
-  // matrix canvas MUST exist in your HTML
   const matrixCanvas = document.getElementById("matrixCanvas");
   if (!matrixCanvas) {
     console.error("matrixCanvas missing from DOM!");
@@ -20,7 +17,6 @@
   }
   const matrixCtx = matrixCanvas.getContext("2d");
 
-  // create explosion canvas if missing (Option B)
   let explosionCanvas = document.getElementById("explosionCanvas");
   if (!explosionCanvas) {
     explosionCanvas = document.createElement("canvas");
@@ -42,7 +38,7 @@
   // DEVICE DETECTION & PERFORMANCE TUNING
   // ------------------------------------------------------
   const isMobile = /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
-  // reduce visual intensity on very old devices or very small screens (simple heuristic)
+  // reduce visual intensity
   const perfTier = isMobile ? "mobile" : "desktop";
 
   // ------------------------------------------------------
@@ -420,7 +416,6 @@
     stopMoving();
     if (circle) circle.style.display = "none";
 
-    // stop particles? we let current particles fade out
     // Build restart screen content
     if (!restartScreen) return;
 
