@@ -574,12 +574,26 @@ function quitToMenu() {
 }
 
   // --------- highscores ----------
-  function saveHighScore(initials, scoreVal) {
-    const scores = JSON.parse(localStorage.getItem('highScores') || '[]');
-    scores.push({ initials, score: scoreVal, difficulty: currentDifficulty.toUpperCase() });
-    scores.sort((a, b) => b.score - a.score);
-    localStorage.setItem('highScores', JSON.stringify(scores.slice(0, 10)));
-  }
+ function saveHighScore(initials, scoreVal) {
+  const scores = JSON.parse(localStorage.getItem('highScores') || '[]');
+
+  // Remove ANY old score with the same initials
+  const filtered = scores.filter(s => s.initials !== initials);
+
+  // Add new one
+  filtered.push({
+    initials,
+    score: scoreVal,
+    difficulty: currentDifficulty.toUpperCase()
+  });
+
+  // Sort high -> low
+  filtered.sort((a, b) => b.score - a.score);
+
+  // Keep only top 10
+  localStorage.setItem('highScores', JSON.stringify(filtered.slice(0, 10)));
+}
+
 
   function displayHighScores(container = restartScreen) {
     const existing = container.querySelector('.high-score-list');
@@ -624,14 +638,20 @@ function quitToMenu() {
     saveBtn.className = 'restart-btn';
     saveBtn.style.marginTop = '1.5vmin';
     saveBtn.addEventListener('pointerdown', () => {
-      const raw = input.value;
-      if (!raw.length) { showWarn('Please enter at least one letter!'); input.focus(); return; }
-      const padded = raw.padEnd(3, '_');
-      const scores = JSON.parse(localStorage.getItem('highScores') || '[]');
-      if (scores.some(s => s.initials === padded)) { showWarn('This one is taken, please choose another!'); input.focus(); return; }
-      saveHighScore(padded, score);
-      wrapper.remove();
-      displayHighScores(restartScreen);
+    const raw = input.value;
+    if (!raw.length) {
+    showWarn('Please enter at least one letter!');
+    input.focus();
+    return;
+    }
+
+    const padded = raw.padEnd(3, '_');
+
+    // Save, now overwriting old score if initials match
+    saveHighScore(padded, score);
+
+    wrapper.remove();
+    displayHighScores(restartScreen);
     });
 
     wrapper.appendChild(label);

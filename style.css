@@ -74,11 +74,9 @@ html, body {
     height: 100vh;
     backdrop-filter: blur(6px);
     background: rgba(0, 0, 0, 0.6);
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     z-index: 10000;
 }
 
@@ -270,7 +268,6 @@ html, body {
     background: radial-gradient(circle at 30% 30%, #66faff, #00bcd4);
     box-shadow: 0 0 30px cyan;
     transition: opacity 0.09s;
-
     animation:
         jelly 0.25s ease-in-out infinite,
         liquid 0.50s ease-in-out infinite,
