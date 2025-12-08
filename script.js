@@ -48,7 +48,6 @@
   let score = 0;
   let timeLeft = 30;
   let gameActive = false;
-
   let combo = 0;
   let maxCombo = 0;
   let misses = 0;
