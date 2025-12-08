@@ -50,15 +50,13 @@ html, body {
     background: rgba(0, 255, 255, 0.15);
     border: 2px solid cyan;
     border-radius: 10px;
-
     color: cyan;
     font-family: "Orbitron", sans-serif;
-    font-size: 18px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 1px;
-
     cursor: pointer;
-    z-index: 9999;  /* ensures the pause button stays above all game layers */
+    z-index: 8000;  /* ensures the pause button stays above all game layers */
     user-select: none;
     transition: 0.15s;
 }
@@ -267,7 +265,7 @@ html, body {
     max-height: 90px;
     border-radius: 50%;
     display: none;
-    z-index: 999;
+    z-index: 9999;
     opacity: 1;
     background: radial-gradient(circle at 30% 30%, #66faff, #00bcd4);
     box-shadow: 0 0 30px cyan;
