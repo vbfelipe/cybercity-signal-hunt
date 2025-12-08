@@ -18,6 +18,146 @@ html, body {
     box-sizing: border-box;
 }
 
+/* ------------------------------------------------------
+   START SCREEN
+------------------------------------------------------ */
+#start {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url('city-bg.jpg') center/cover no-repeat, rgba(0,0,0,0.65);
+    background-blend-mode: darken;
+    text-align: center;
+    z-index: 100;
+}
+
+.start-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 3vmin;
+    align-items: center;
+    padding: 2vmin;
+}
+
+/* Glitchy Title */
+.title {
+    margin: 0;
+    font-size: clamp(28px, 9vmin, 70px);
+    letter-spacing: 0.5vmin;
+    color: #f0f;
+    text-shadow: 
+        0 0 10px #f0f,
+        0 0 20px #f0f,
+        0 0 40px #0ff;
+    position: relative;
+    animation: glitch-flicker 2.5s infinite;
+}
+
+/* Create ghost layers */
+.title::before,
+.title::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0.6;
+    mix-blend-mode: screen;
+}
+
+.title::before {
+    color: #0ff;
+    transform: translate(3px, 0);
+    animation: glitch-anim-1 2s infinite;
+}
+
+.title::after {
+    color: #f0f;
+    transform: translate(-3px, 0);
+    animation: glitch-anim-2 1.8s infinite;
+}
+
+/* Flicker */
+@keyframes glitch-flicker {
+    0%, 15%, 100% { opacity: 1; }
+    16% { opacity: 0.7; }
+    17% { opacity: 1; }
+    45% { opacity: 0.9; }
+    46% { opacity: 0.4; }
+    47% { opacity: 1; }
+}
+
+/* Glitch shifts */
+@keyframes glitch-anim-1 {
+    0%, 100% { clip-path: inset(0 0 0 0); transform: translate(3px, 0); }
+    10% { clip-path: inset(20% 0 60% 0); transform: translate(5px, -2px); }
+    20% { clip-path: inset(40% 0 20% 0); transform: translate(-3px, 2px); }
+    30% { clip-path: inset(10% 0 70% 0); transform: translate(3px, -1px); }
+}
+
+@keyframes glitch-anim-2 {
+    0%, 100% { clip-path: inset(0 0 0 0); transform: translate(-3px, 0); }
+    15% { clip-path: inset(70% 0 5% 0); transform: translate(-6px, 1px); }
+    25% { clip-path: inset(30% 0 30% 0); transform: translate(2px, -1px); }
+    40% { clip-path: inset(90% 0 0 0); transform: translate(-3px, 2px); }
+}
+
+.subtitle, 
+.difficulty-title {
+    opacity: 0.85;
+    font-size: clamp(12px, 3vmin, 22px);
+}
+
+/* Difficulty buttons */
+#difficultySelect {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2vmin;
+    justify-content: center;
+}
+
+.diff-btn {
+    padding: 2vmin 4vmin;
+    border: 2px solid #0ff;
+    border-radius: 12px;
+    opacity: 0.7;
+    cursor: pointer;
+    font-size: clamp(12px, 3vmin, 22px);
+    background: rgba(0,0,0,0.35);
+    transition: 0.15s;
+}
+
+.diff-btn.active {
+    opacity: 1;
+    background: rgba(0,255,255,0.2);
+    box-shadow: 0 0 15px #0ff;
+}
+
+#startButton {
+    margin-top: 4vmin;
+    padding: 2vmin 6vmin;
+    border: 2px solid #0ff;
+    border-radius: 14px;
+    font-size: clamp(16px, 4vmin, 28px);
+    cursor: pointer;
+    background: rgba(0,0,0,0.4);
+    transition: 0.2s;
+}
+
+#startButton:hover {
+    transform: scale(1.12);
+    background: rgba(0,255,255,0.2);
+    box-shadow: 0 0 15px #0ff;
+}
+
+.credits {
+    opacity: 0.5;
+    font-size: clamp(10px, 2vmin, 16px);
+    margin-top: 4vmin;
+}
+
+/* --- Matrix Background --- */
 #matrixCanvas {
     position: fixed;
     inset: 0;
@@ -131,91 +271,6 @@ html, body {
 .quitBtn:hover {
     background: rgba(0, 255, 255, 0.35);
     transform: scale(1.07);
-}
-
-/* ------------------------------------------------------
-   START SCREEN
------------------------------------------------------- */
-#start {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: url('city-bg.jpg') center/cover no-repeat, rgba(0,0,0,0.65);
-    background-blend-mode: darken;
-    text-align: center;
-    z-index: 100;
-}
-
-.start-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 3vmin;
-    align-items: center;
-    padding: 2vmin;
-}
-
-.title {
-    margin: 0;
-    color: #f0f;
-    font-size: clamp(28px, 9vmin, 70px);
-    letter-spacing: 0.5vmin;
-    text-shadow: 0 0 20px #f0f, 0 0 40px #0ff;
-}
-
-.subtitle, 
-.difficulty-title {
-    opacity: 0.85;
-    font-size: clamp(12px, 3vmin, 22px);
-}
-
-/* Difficulty buttons */
-#difficultySelect {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2vmin;
-    justify-content: center;
-}
-
-.diff-btn {
-    padding: 2vmin 4vmin;
-    border: 2px solid #0ff;
-    border-radius: 12px;
-    opacity: 0.7;
-    cursor: pointer;
-    font-size: clamp(12px, 3vmin, 22px);
-    background: rgba(0,0,0,0.35);
-    transition: 0.15s;
-}
-
-.diff-btn.active {
-    opacity: 1;
-    background: rgba(0,255,255,0.2);
-    box-shadow: 0 0 15px #0ff;
-}
-
-#startButton {
-    margin-top: 4vmin;
-    padding: 2vmin 6vmin;
-    border: 2px solid #0ff;
-    border-radius: 14px;
-    font-size: clamp(16px, 4vmin, 28px);
-    cursor: pointer;
-    background: rgba(0,0,0,0.4);
-    transition: 0.2s;
-}
-
-#startButton:hover {
-    transform: scale(1.12);
-    background: rgba(0,255,255,0.2);
-    box-shadow: 0 0 15px #0ff;
-}
-
-.credits {
-    opacity: 0.5;
-    font-size: clamp(10px, 2vmin, 16px);
-    margin-top: 4vmin;
 }
 
 /* ------------------------------------------------------
