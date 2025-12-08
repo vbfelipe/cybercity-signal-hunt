@@ -41,6 +41,102 @@ html, body {
 #score { left: 2vw; }
 #timer { right: 2vw; }
 
+.pause-btn {
+    display: none;
+    position: fixed;
+    top: 7vh;       
+    right: 2vw;     
+    padding: 10px 18px;
+    background: rgba(0, 255, 255, 0.15);
+    border: 2px solid cyan;
+    border-radius: 10px;
+
+    color: cyan;
+    font-family: "Orbitron", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+
+    cursor: pointer;
+    z-index: 9999;  /* ensures the pause button stays above all game layers */
+    user-select: none;
+    transition: 0.15s;
+}
+
+.pause-btn:hover {
+    background: rgba(0, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+#pausedOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.6);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 10000;
+}
+
+#pausedOverlay div {
+    font-family: "Orbitron", sans-serif;
+    font-size: 48px;
+    color: cyan;
+    text-shadow: 0 0 12px cyan;
+    letter-spacing: 3px;
+}
+
+#pausedOverlay .paused-title {
+    font-size: 16vmin;
+    color: red;
+    text-shadow: 0 0 12px red;
+    font-family: "Orbitron", sans-serif;
+    margin-bottom: 30px;
+}
+
+.resume-btn {
+    padding: 12px 28px;
+    margin-bottom: 10px;
+    background: rgba(0, 255, 255, 0.2);
+    border: 2px solid #0ff;
+    border-radius: 12px;
+    font-family: "Orbitron", sans-serif;
+    font-size: 24px;
+    color: #0ff;
+    cursor: pointer;
+    transition: 0.15s;
+    text-shadow: 0 0 10px #0ff;
+}
+
+.resume-btn:hover {
+    background: rgba(0, 255, 255, 0.35);
+    transform: scale(1.07);
+}
+
+.quitBtn {
+    padding: 12px 28px;
+    background: rgba(0, 255, 255, 0.2);
+    border: 2px solid #0ff;
+    border-radius: 12px;
+    font-family: "Orbitron", sans-serif;
+    font-size: 24px;
+    color: #0ff;
+    cursor: pointer;
+    transition: 0.15s;
+    text-shadow: 0 0 10px #0ff;
+}
+
+.quitBtn:hover {
+    background: rgba(0, 255, 255, 0.35);
+    transform: scale(1.07);
+}
+
 /* ------------------------------------------------------
    START SCREEN
 ------------------------------------------------------ */

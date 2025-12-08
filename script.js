@@ -9,6 +9,8 @@
   const restartScreen = $('#restart');
   const diffButtons = document.querySelectorAll('.diff-btn');
   const matrixCanvas = $('#matrixCanvas');
+  let gamePaused = false;
+  let pausedOverlay = null;
 
   if (!matrixCanvas) {
     console.error('matrixCanvas missing');
@@ -351,6 +353,16 @@ function startMoving() {
     startButton.addEventListener('pointerdown', (e) => { e.preventDefault(); startGame(); }, { passive: false });
   }
 
+const pauseBtn = document.getElementById('pauseBtn');
+
+if (pauseBtn) {
+  pauseBtn.addEventListener('pointerdown', () => {
+    togglePause();
+    pauseBtn.textContent = gamePaused ? 'RESUME' : 'PAUSE';
+  });
+}
+
+
   // --------- timer & game flow ----------
   function updateScore() { if (scoreEl) scoreEl.textContent = `Score: ${score}`; }
   function updateTimer() { if (timerEl) timerEl.textContent = timeLeft; }
@@ -366,6 +378,10 @@ function startMoving() {
   }
 
   function startGame() {
+    gamePaused = false;
+    document.getElementById('pausedOverlay')?.remove();
+    const pauseBtn = document.getElementById('pauseBtn');
+    if (pauseBtn) { pauseBtn.style.display = 'block'; pauseBtn.textContent = 'PAUSE'; }
     score = combo = maxCombo = misses = 0;
     timeLeft = 30;
     gameActive = true;
@@ -385,7 +401,8 @@ function startMoving() {
     stopMoving();
     if (circle) circle.style.display = 'none';
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-
+    const pauseBtn = document.getElementById('pauseBtn');
+    if (pauseBtn) { pauseBtn.style.display = 'none'; pauseBtn.textContent = 'PAUSE'; }
     if (!restartScreen) return;
     restartScreen.innerHTML = '';
     const title = document.createElement('div');
@@ -435,6 +452,126 @@ function startMoving() {
     restartScreen.style.flexDirection = 'column';
     restartScreen.style.alignItems = 'center';
   }
+  
+  // --------- pause/resume ----------
+
+  function pauseGame() {
+  if (!gameActive || gamePaused) return;
+
+  gamePaused = true;
+  gameActive = false;
+  
+  const pauseBtn = document.getElementById('pauseBtn');
+  if (pauseBtn) pauseBtn.textContent = 'RESUME';
+
+  stopMoving();
+  if (timerInterval) clearInterval(timerInterval);
+
+  // Pause matrix animation
+  if (matrixRAF) {
+    cancelAnimationFrame(matrixRAF);
+    matrixRAF = null;
+  }
+
+  // Pause explosion particles
+  if (explRAF) {
+    cancelAnimationFrame(explRAF);
+    explRAF = null;
+  }
+
+  // ----- OVERLAY WITH RESUME & QUIT BUTTON -----
+  pausedOverlay = document.createElement('div');
+  pausedOverlay.id = 'pausedOverlay';
+  pausedOverlay.innerHTML = `
+    <div class="paused-title">PAUSED</div>
+    <div id="resumeBtn" class="resume-btn">RESUME</div>
+    <div id="quitBtn" class="resume-btn">QUIT</div>
+  `;
+  pausedOverlay.style.cssText = `
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.55);
+    z-index: 9999;
+    user-select: none;
+  `;
+
+  document.body.appendChild(pausedOverlay);
+
+  document.getElementById("resumeBtn").onclick = resumeGame;
+  document.getElementById("quitBtn").onclick = quitToMenu;
+}
+
+// --------- resume game ----------
+function resumeGame() {
+  if (!gamePaused) return;
+
+  gamePaused = false;
+  gameActive = true;
+
+  if (pausedOverlay) {
+    pausedOverlay.remove();
+    pausedOverlay = null;
+  }
+
+  // Resume systems
+  startMoving();
+  startTimer();
+
+  if (!matrixRAF) matrixRAF = requestAnimationFrame(drawMatrix);
+  if (!explRAF && particles.length > 0)
+    explRAF = requestAnimationFrame(explosionLoop);
+
+  const pauseBtn = document.getElementById('pauseBtn');
+  if (pauseBtn) pauseBtn.textContent = 'PAUSE';
+}
+
+function togglePause() {
+  if (gamePaused) resumeGame();
+  else pauseGame();
+}
+
+// --------- quit to menu ----------
+function quitToMenu() {
+  // Unpause state
+  gamePaused = false;
+  gameActive = false;
+
+  // Remove overlay if it exists
+  if (pausedOverlay) {
+    pausedOverlay.remove();
+    pausedOverlay = null;
+  }
+
+  // Reset gameplay systems
+  stopMoving();
+  if (timerInterval) clearInterval(timerInterval);
+  if (matrixRAF) {
+    cancelAnimationFrame(matrixRAF);
+    matrixRAF = null;
+  }
+  if (explRAF) {
+    cancelAnimationFrame(explRAF);
+    explRAF = null;
+  }
+
+  // Hide pause button
+  const pauseBtn = document.getElementById("pauseBtn");
+  if (pauseBtn) {
+    pauseBtn.style.display = "none";
+    pauseBtn.textContent = "PAUSE";
+  }
+
+  // Show the START screen again
+  document.getElementById("start").style.display = "flex";
+
+  // Hide restart screen + target circle
+  document.getElementById("restart").style.display = "none";
+  document.getElementById("circle").style.display = "none";
+}
 
   // --------- highscores ----------
   function saveHighScore(initials, scoreVal) {
